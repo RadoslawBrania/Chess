@@ -20,6 +20,11 @@ class King : public RestrictedPiece
     
     void display() const;
 
+    bool isInitialPosition() const;
+
+
+    string getName() const;
+
 }; 
 
 #endif

@@ -29,6 +29,8 @@ class Pawn : public RestrictedPiece
 
 
     void display() const;
+
+    string getName() const;
    
    
  private:

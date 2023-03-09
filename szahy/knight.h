@@ -23,6 +23,8 @@ class Knight : public Piece
 
     void display() const;
 
+    string getName() const;
+
 };
 
 #endif

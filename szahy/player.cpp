@@ -1,9 +1,18 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
 #include "player.h"
 #include "board.h"
 #include "game.h"
 #include <string>
+#include <chrono>
+#include <ctime>
 
+#include "bishop.h"
+#include "knight.h"
+#include "queen.h"
+#include "rook.h"
 #define X_MIN 'a'
 #define X_MAX 'h'
 #define Y_MIN '1'
@@ -18,15 +27,33 @@ Player::~Player()
 {
 }
 
-bool Player::makeMove()
+bool Player::makeMove(int fSquare, int tSquare)
 {
+    string fromSquare = "";
+    string toSquare = "";
+  
+    char c = char(8 - (fSquare / 8) + 48);
+    char f = char(fSquare % 8 + 97);
+
+    
+
+
     string badInput; 
-    string fromSquare =  "  ";
-    string toSquare = "  ";
-    int fromX;
-    int fromY;
-    int toX;
-    int toY;
+  
+    fromSquare += f;
+    fromSquare += c;
+    f = char(tSquare % 8 +97);
+    c = char(8 - tSquare / 8 +48);
+  
+   
+    toSquare += f;
+    toSquare += c;
+    std::cout << toSquare;
+    std::cout << fromSquare;
+    int fromX=0;
+    int fromY=0;
+    int toX=0;
+    int toY=0;
     
 
     if(inCheck())
@@ -35,11 +62,7 @@ bool Player::makeMove()
     }
     
 
-    cout << _name << " wprowadz ruch (np. a2 a4): ";
-    cin >> fromSquare >> toSquare;
-    
-
-    while(fromSquare.length() != 2 ||
+    while (fromSquare.length() != 2 ||
           toSquare.length() != 2 ||
           tolower(fromSquare.at(0)) < X_MIN ||
           tolower(fromSquare.at(0)) > X_MAX ||
@@ -53,17 +76,27 @@ bool Player::makeMove()
                                       tolower(fromSquare.at(1)) - Y_MIN)->occupied())
           )
     {
-        cerr << "Niepoprawny ruch, sprobuj jeszcze raz" << endl;
-        cin.clear();
-        getline(cin, badInput); 
-        cout << _name << " wprowadz ruch (np. a2 a4): ";
-        cin >> fromSquare >> toSquare;
+        return 0;
+        toSquare = "";
+        fromSquare = "";
     }
     
     fromX = tolower(fromSquare.at(0)) - X_MIN;
     fromY = tolower(fromSquare.at(1)) - Y_MIN;
     toX = tolower(toSquare.at(0)) - X_MIN;
     toY = tolower(toSquare.at(1)) - Y_MIN;
+    // stworzenie pliku z ostatnim ruchem do save'a i en passant
+    ofstream MyFile("Last move.txt");
+    MyFile << fromSquare << " ruch na " << toSquare << endl;
+    MyFile.close();
+    ofstream MyFile_octal("Last_move_octal.txt");
+
+    if (Board::getBoard()->squareAt(fromX, fromY)->occupiedBy());
+    {
+
+        MyFile_octal <</* Board::getBoard()->squareAt(fromX, fromY)->occupiedBy()->getName() <<*/ fromX << fromY << toX << toY << endl; ;
+    }
+    MyFile_octal.close();
     
     return Board::getBoard()->squareAt(fromX, fromY)->occupiedBy()->moveTo(*this, 
                                                                   *(Board::getBoard()->squareAt(toX, toY)));
@@ -88,6 +121,91 @@ bool Player::inCheck()
     return check;
 }
 
+bool Player::inCheckMate()
+{
+    bool checkMate = true;
+
+
+
+    for (set<Piece*>::iterator itr = myPieces()->begin();
+        itr != myPieces()->end(); ++itr)
+    {
+        for(int i = 0; i < 8; i++)
+        {
+	        for(int j = 0; j < 8; j++)
+	        {
+                Square& toSquare = *Board::getBoard()->squareAt(i, j);
+                if ((*itr)->location() &&
+                    (*itr)->canMoveTo(toSquare) && !(*itr)->tryCheck(*this, toSquare))
+                {
+                    if(toSquare.occupied())
+                    {
+                        if (toSquare.occupiedBy()->isWhite() == this->isWhite()) continue;
+                    }
+                    return false;
+                }
+	        }
+        }
+    }
+
+    return checkMate;
+}
+
+bool Player::availablePromotion() const
+{
+    int y;
+    if (isWhite()) y = 7;
+    else y = 0;
+    for (set<Piece*>::iterator itr = myPieces()->begin();
+        itr != myPieces()->end(); ++itr)
+    {
+        if ((*itr)->getName()[1] == 'P' && (*itr)->location() && (*itr)->location()->getY() == y) return true;
+    }
+
+    return false;
+}
+
+void Player::promotePawn(char piece)
+{
+    int y;
+    if (isWhite()) y = 7;
+    else y = 0;
+    for (set<Piece*>::iterator itr = myPieces()->begin();
+        itr != myPieces()->end(); ++itr)
+    {
+            if ((*itr)->getName()[1] == 'P' && (*itr)->location() && (*itr)->location()->getY() == y)
+            {
+
+                Square* square = (*itr)->location();
+                Piece* piecePtr;
+	            (*itr)->setLocation(NULL);
+                switch (piece)
+                {
+                case 'W':
+                    piecePtr = new Rook(isWhite());
+                    break;
+                case 'G':
+                    piecePtr = new Bishop(isWhite());
+                    break;
+                case 'S':
+                    piecePtr = new Knight(isWhite());
+                    break;
+                default:
+                case 'Q':
+                    piecePtr = new Queen(isWhite());
+                    break;
+                }
+
+                square->setOccupier(piecePtr);
+                piecePtr->setLocation(square);
+                myPieces()->insert(piecePtr);
+            }
+    }
+
+}
+
+
+
 void Player::capture(Piece* aPiece)
 {
     aPiece->setLocation(NULL);
@@ -102,6 +220,7 @@ string Player::getName() const
 
 bool Player::isWhite() const
 {
+   
     return _isWhite;
 }
 

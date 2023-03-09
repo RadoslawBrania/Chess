@@ -34,3 +34,8 @@ void Rook::display() const
 {
     cout << _color + "W";
 }
+
+string Rook::getName() const
+{
+    return _color + "W";
+}

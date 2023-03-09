@@ -40,3 +40,10 @@ void Queen::display() const
 {
     cout << _color + "Q";
 }
+
+string Queen::getName() const
+{
+    return _color + "Q";
+}
+
+

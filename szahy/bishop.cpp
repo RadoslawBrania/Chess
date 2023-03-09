@@ -30,3 +30,8 @@ void Bishop::display() const
 {
     cout << _color + "G";
 }
+
+string Bishop::getName() const
+{
+	return _color + "G";
+}

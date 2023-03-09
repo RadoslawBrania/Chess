@@ -15,14 +15,20 @@ public:
     Player(string name, bool isWhite, King& myKing, set<Piece*>& myPieces);
     ~Player();
 
-    bool makeMove();
+    bool makeMove(int fSquare, int tSquare);
     
     bool inCheck();
+
+    bool inCheckMate();
+
+    bool availablePromotion() const ;
+
+    void promotePawn(char piece);
 
     void capture(Piece* aPiece);
     
     string getName() const;
-    
+
 
     bool isWhite() const;
     

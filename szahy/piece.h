@@ -32,9 +32,11 @@ class Piece
 
     string color() const;    
     
- 
-    virtual void display() const = 0;   
+    bool tryCheck(Player& byPlayer, Square& toSquare);
 
+    virtual void display() const = 0;
+
+    virtual string getName() const = 0;
 
     virtual bool canMoveTo(Square& location) const = 0;
 

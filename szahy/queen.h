@@ -24,5 +24,7 @@ class Queen : public Piece
 
     void display() const;
 
+    string getName() const;
+
 }; 
 #endif

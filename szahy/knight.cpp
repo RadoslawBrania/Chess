@@ -40,4 +40,8 @@ void Knight::display() const
 }
 
 
+string Knight::getName() const
+{
+    return _color + "S";
+}
 

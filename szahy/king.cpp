@@ -33,6 +33,16 @@ bool King::canMoveTo(Square& location) const
     {
         validMove = true;
     }
+
+    else if(abs(translationY) == 0 && 
+        isInitialPosition() && 
+        location.occupied() && 
+        location.occupiedBy()->getName()[1] == 'W' &&
+        (location.getX() == 0 || location.getX() == 7) && 
+        Board::getBoard()->isClearHorizontal(*this->location(), location))
+    {
+        validMove = true;
+    }
     
     return validMove;
 }
@@ -40,4 +50,16 @@ bool King::canMoveTo(Square& location) const
 void King::display() const
 {
     cout << _color + "K";
+}
+
+string King::getName() const
+{
+    return _color + "K";
+}
+
+bool King::isInitialPosition() const
+{
+    if (isWhite() && this->location()->getY() == 0 && this->location()->getX() == 4) return true;
+    if (!isWhite() && this->location()->getY() == 7 && this->location()->getX() == 4) return true;
+    return false;
 }

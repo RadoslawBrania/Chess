@@ -45,14 +45,7 @@ bool Pawn::moveTo(Player& byPlayer, Square& to)
         valid = RestrictedPiece::moveTo(byPlayer, to);
         
  
-        if(valid)
-        {
-            if(Board::getBoard()->isEndRow(*location()))
-            {
-                _delegate = new Queen(isWhite());
-                _delegate->setLocation(location());
-            }
-        }
+       
     }
     
     return valid;
@@ -110,3 +103,7 @@ void Pawn::display() const
     }
 }
 
+string Pawn::getName() const
+{
+    return _color + "P";
+}
